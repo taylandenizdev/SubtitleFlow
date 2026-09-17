@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Video transkripti ve Türkçe çeviri · SubtitleFlow</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="masthead">
+        <span class="wordmark">SubtitleFlow</span>
+      </header>
+
+      <h1>Video transkripti ve Türkçe çeviri</h1>
+      <p class="lede">
+        Yalnız ses alınır; kaynak metin <code>outputs/transkriptler/</code>,
+        Türkçe çeviri <code>outputs/ceviriler/</code> klasörüne Markdown olarak
+        kaydedilir.
+        <span id="route-sentence">Transkript ElevenLabs Scribe v2, Türkçe çeviri Google Translation LLM (Basic v2) ile yapılır.</span>
+        <span id="runtime-note"></span>
+      </p>
+
+      <form id="transcript-form" class="card" novalidate>
+        <div class="field">
+          <label for="video-url">Transkript alınacak video linki</label>
+          <input
+            id="video-url"
+            name="url"
+            type="url"
+            inputmode="url"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="https://www.youtube.com/watch?v=…"
+            aria-describedby="url-error"
+          />
+          <p id="url-error" class="field-error" role="alert" hidden></p>
+        </div>
+
+        <p id="mt-google-hint" class="field-hint" hidden></p>
+
+        <label class="check cloud-option">
+          <input id="allow-paid" type="checkbox" />
+          <span class="check-text">
+            <strong>Ücretli sağlayıcı kullanımına izin ver</strong>
+            <small>
+              Scribe STT ve Google Translation LLM aşamalarını kapsar. Kayıtlı
+              kaynak varsa Scribe ücretsiz yeniden kullanılır; yeni bir ücretli
+              çağrı için bu onay gerekir.
+            </small>
+          </span>
+        </label>
+
+        <label class="check">
+          <input id="burn-video" type="checkbox" />
+          <span class="check-text">
+            <strong>Türkçe altyazılı video oluştur</strong>
+            <small>
+              Tam video indirilir ve Türkçe altyazı kalıcı olarak gömülür;
+              sonuç <code>outputs/videolar/</code> klasörüne kaydedilir.
+              Varsayılan kapalıdır.
+            </small>
+          </span>
+        </label>
+
+        <details class="options">
+          <summary>Seçenekler</summary>
+          <div class="options-body">
+            <div class="field cloud-option">
+              <label for="reservation">Toplam rezervasyon sınırı (USD)</label>
+              <input
+                id="reservation"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                value="1.00"
+                aria-describedby="reservation-hint"
+              />
+              <p id="reservation-hint" class="field-hint">
+                Seçilen tüm ücretli aşamalar için toplam yerel sınırdır;
+                sağlayıcı faturasını garanti etmez.
+              </p>
+            </div>
+
+            <div class="field cloud-option">
+              <label for="per-call-reservation">Çağrı başı üst sınır (USD)</label>
+              <input
+                id="per-call-reservation"
+                type="text"
+                inputmode="decimal"
+                autocomplete="off"
+                value="0.05"
+                aria-describedby="per-call-hint"
+              />
+              <p id="per-call-hint" class="field-hint">
+                Her ücretli HTTP denemesi için yerel üst sınırdır; toplam sınırdan
+                bağımsızdır ve sağlayıcı faturasını garanti etmez.
+              </p>
+            </div>
+
+            <div class="field">
+              <label for="source-language">Kaynak dil (isteğe bağlı)</label>
+              <select id="source-language">
+                <option value="">Otomatik algıla</option>
+                <option value="en">İngilizce</option>
+                <option value="ar">Arapça</option>
+                <option value="fa">Farsça</option>
+                <option value="ru">Rusça</option>
+                <option value="de">Almanca</option>
+                <option value="he">İbranice</option>
+              </select>
+            </div>
+          </div>
+        </details>
+
+        <div class="actions">
+          <button id="submit" type="submit">Transkripti al ve Türkçeye çevir</button>
+          <p id="status" class="status" role="status" aria-live="polite">Hazır</p>
+        </div>
+      </form>
+
+      <section id="result" class="panel" aria-live="polite" hidden>
+        <div class="panel-head">
+          <h2 id="result-title">Sonuç</h2>
+          <div class="panel-actions">
+            <button id="result-reveal" class="panel-action" type="button" hidden>
+              Klasörü aç
+            </button>
+            <button id="video-reveal" class="panel-action" type="button" hidden>
+              Videolar klasörünü aç
+            </button>
+          </div>
+        </div>
+        <p id="result-file" class="result-file"></p>
+        <p id="result-video" class="result-file" hidden></p>
+
+        <div class="tabs" role="tablist">
+          <button id="tab-source" class="tab" type="button" role="tab" aria-selected="true">
+            Kaynak transkript
+          </button>
+          <button id="tab-translation" class="tab" type="button" role="tab" aria-selected="false">
+            Türkçe çeviri
+          </button>
+        </div>
+
+        <div id="view-source" class="view">
+          <div class="view-actions">
+            <a id="source-download" class="download" href="#" download hidden>İndir</a>
+            <button id="source-save" class="panel-action" type="button" hidden>Kaydet</button>
+            <button id="source-copy" class="panel-action" type="button">Kopyala</button>
+          </div>
+          <pre id="source-preview" class="preview" tabindex="0"></pre>
+        </div>
+
+        <div id="view-translation" class="view" hidden>
+          <div class="view-actions">
+            <a id="translation-download" class="download" href="#" download hidden>İndir</a>
+            <button id="translation-save" class="panel-action" type="button" hidden>Kaydet</button>
+            <button id="translation-copy" class="panel-action" type="button">Kopyala</button>
+          </div>
+          <pre id="translation-preview" class="preview" tabindex="0"></pre>
+        </div>
+
+        <div id="result-actions" class="result-actions">
+          <button id="result-translate" class="secondary" type="button" hidden>
+            Türkçe çeviriyi başlat / yeniden dene
+          </button>
+        </div>
+      </section>
+
+      <section id="library" class="panel" hidden>
+        <div class="panel-head">
+          <h2>Kayıtlı belgeler</h2>
+          <button id="library-reveal" class="panel-action" type="button" hidden>
+            Klasörü aç
+          </button>
+        </div>
+        <ul id="library-list" class="library-list"></ul>
+      </section>
+    </main>
+
+    <script src="/assets/app.js" defer></script>
+  </body>
+</html>
