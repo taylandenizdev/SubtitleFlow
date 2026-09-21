@@ -104,36 +104,82 @@ uv sync --locked --extra api --extra cli --extra desktop
 
 ## API hesapları, anahtarlar ve .env
 
-İki hesap gerekir: konuşma-metni için ElevenLabs, çeviri için Google Cloud.
+İki hesap gerekir: konuşma-metni (STT) için **ElevenLabs**, çeviri için **Google
+Cloud**. İki hizmet de ücretlidir; kullanım, hesabınızın güncel planına/kotasına
+ya da kullandıkça öde düzeninize bağlıdır. Çalıştırmadan önce hesabınızın
+kotasını ve faturalandırmasını doğrulayın. Ücretsiz kullanım sözü verilmez.
+
 Google Cloud projesinde **faturalandırmanın (billing) etkin olması gerekir**;
-hizmet koşulları bunu şart koşar. ElevenLabs API'sinin kullanılabilirliği ve
-kullanımı hesabınızın güncel planına/kotasına ya da kullandıkça öde düzeninize
-bağlıdır; çalıştırmadan önce hesabınızı doğrulayın. Ücretsiz kullanım sözü
-verilmez.
+Cloud Translation API hizmet koşulları bunu şart koşar.
+
+> Not: Google Cloud ve ElevenLabs arayüzlerinin dili ve menü yerleşimi zamanla
+> veya hesap dil ayarına göre biraz değişebilir. Aşağıdaki adımlar İngilizce
+> arayüzü anlatır; birebir aynı görünmese de aynı işlevi arayın.
+
+Bu masaüstü uygulaması Google isteklerini **sizin makinenizden** yapar. Bu yüzden
+aşağıdaki anahtarlar ve uygulama kısıtları tarayıcı değil, bu bilgisayar için
+düşünülmelidir.
 
 ### ElevenLabs API anahtarı
 
-
-1. <https://elevenlabs.io/app/developers/api-keys> adresinden hesap oluşturun veya giriş yapın.
-2. Sol menüden **Developers → API Keys**'e gidin.
-3. **Create API key** ile kısıtlı bir anahtar üretin; **Speech-to-Text/Scribe**
-   erişimini etkinleştirin. İsteğe bağlı bir kredi limiti koyabilirsiniz.
-4. Tam anahtar **yalnızca bir kez** gösterilir; hemen `ELEVENLABS_API_KEY`
-   değerine kopyalayın.
+1. Tarayıcıdan doğrudan anahtar sayfasını açın:
+   <https://elevenlabs.io/app/developers/api-keys>. Hesabınız yoksa **Sign up**
+   ile oluşturun, varsa **Log in** ile giriş yapın.
+2. Sayfa doğrudan açılmazsa sol menüden **Developers** → **API Keys** yolunu izleyin.
+3. **Create API key** düğmesine basın.
+4. Açılan pencerede anahtara anlamlı bir **isim** verin (örn. `subtitleflow-desktop`).
+5. İzinler bölümünde arayüz izin veriyorsa yalnızca **Speech-to-Text** /
+   **Scribe** kapsamını seçin; hesabın tamamına yetki veren geniş izinlerden
+   kaçının.
+6. İsterseniz isteğe bağlı bir **kredi limiti (credit limit)** belirleyin.
+7. **Create API key** ile onaylayın. Tam anahtar **yalnızca bir kez** gösterilir;
+   pencereyi kapatmadan kopyalayın.
+8. Kopyaladığınız değeri `.env` dosyasındaki `ELEVENLABS_API_KEY` satırına
+   yapıştırın (aşağıdaki `.env` bölümüne bakın).
+9. ElevenLabs panelinde hesabınızın **kotasını/kullanımını** ve gerekiyorsa
+   **faturalandırma** durumunu kontrol edin; planınızın bu kullanımı
+   karşıladığından emin olun.
 
 ### Google Cloud Translation API anahtarı
 
-
-1. <https://console.cloud.google.com/> üzerinde bir proje oluşturun veya seçin.
-2. Projede **faturalandırmayı etkinleştirin** (billing hesabı bağlayın).
-3. **Cloud Translation API**'yi etkinleştirin: API kimliği
-   `translate.googleapis.com`.
-4. **APIs & Services → Credentials → Create credentials → API key** ile anahtar
-   üretin.
-5. Anahtarı **Cloud Translation API** ile sınırlayın; tercihen bir uygulama
-   ve/veya IP kısıtı da ekleyin.
-6. `GOOGLE_TRANSLATION_PROJECT` değeri projenin **Project ID**'sidir; görünen
-   ad (display name) veya proje numarası değildir.
+1. <https://console.cloud.google.com/> adresini açın ve Google hesabınızla giriş
+   yapın.
+2. Üst çubuktaki **proje seçici**ye (mevcut proje adının göründüğü açılır menü)
+   tıklayın.
+3. **New Project**'i seçin.
+4. **Project name** alanına anlamlı bir ad yazın (örn. `subtitleflow`); kuruluş
+   hesabı kullanıyorsanız uygun **Location**'ı seçin ve **Create**'e basın.
+5. Projenin oluşmasını bekleyin, ardından üstteki **proje seçici**den bu yeni
+   projeyi seçin.
+6. **Navigation menu** (sol üstteki üç çizgi) → **Billing** yolunu açın.
+   Faturalandırma hesabı bağlı değilse **Link a billing account** deyin; hesap
+   yoksa yeni bir faturalandırma hesabı oluşturun ve gerekirse **ödeme profili
+   (payment profile)** bilgilerini ekleyin. Projenin faturalandırmaya bağlı
+   olduğunu doğrulayın.
+7. **Navigation menu** → **APIs & Services** → **Library** yolunu açın.
+8. Arama kutusuna **Cloud Translation API** yazın, sonuçtan seçin ve **Enable**
+   düğmesine basın. Bu API'nin kimliği `translate.googleapis.com`'dur.
+9. **APIs & Services** → **Credentials** sayfasına gidin.
+10. Üstteki **Create credentials** → **API key**'i seçin. Anahtar hemen
+    oluşturulur ve ekranda gösterilir; kopyalayın.
+11. **Hemen** anahtarı kısıtlayın: gösterilen pencerede veya listede anahtarın
+    yanındaki **Edit** (kalem) simgesine basın.
+12. **API restrictions** altında **Restrict key**'i seçin, listeden **Cloud
+    Translation API**'yi işaretleyin ve **Save**'e basın.
+13. **Application restrictions** bölümünü dikkatli ayarlayın:
+    - **IP addresses**: yalnızca **sabit bir dış IP adresiniz (stable outbound
+      IP)** varsa kullanışlıdır; değişken ev/ofis IP'sinde uygulamayı kilitler.
+    - **Websites/HTTP referrers** veya **Android/iOS apps**: bu yerel masaüstü
+      uygulaması için uygun değildir; tarayıcıdan gelen istekleri varsayar.
+      Bunları seçmeyin.
+    - Emin değilseniz yalnızca **API restrictions** (Cloud Translation API) ile
+      bırakın.
+14. `GOOGLE_TRANSLATION_PROJECT` değeri projenin **Project ID**'sidir; görünen ad
+    (display name) veya proje numarası değildir. Proje seçicideki projeyi açıp
+    **Project ID**'yi tam olarak kopyalayın.
+15. İsteğe bağlı: **Billing** → **Budgets & alerts** ile bir bütçe uyarısı kurun.
+    Bunun **yalnızca uyarı** verdiğini, harcamayı **otomatik kesmediğini**
+    unutmayın; sert bir üst sınır değildir.
 
 ### `.env` dosyası
 
@@ -153,7 +199,8 @@ Copy-Item .env.example .env
 notepad .env
 ```
 
-Gerekli minimum içerik (köşeli parantezler yer tutucudur, gerçek değer değildir):
+Dosyaya şu üç satırı yazın (köşeli parantezler yer tutucudur, gerçek değer
+değildir):
 
 ```dotenv
 ELEVENLABS_API_KEY=<elevenlabs-api-key>
@@ -161,9 +208,28 @@ GOOGLE_TRANSLATION_PROJECT=<google-cloud-project-id>
 GOOGLE_TRANSLATION_API_KEY=<google-translation-api-key>
 ```
 
+Şimdi **köşeli parantezleri (`<` ve `>` dahil) silin** ve her değeri `=` işaretinin
+hemen ardına yapıştırın. Her değerin nereden geldiği:
+
+- `ELEVENLABS_API_KEY` → ElevenLabs **API Keys** sayfasında oluşturduğunuz anahtar.
+- `GOOGLE_TRANSLATION_PROJECT` → Google Cloud projesinin **Project ID**'si.
+- `GOOGLE_TRANSLATION_API_KEY` → Google Cloud **Credentials** sayfasında oluşturup
+  kısıtladığınız API anahtarı.
+
+Kurallar:
+
 - `=` işaretinin çevresine tırnak veya boşluk koymayın.
-- `.env` Git tarafından yok sayılır; **asla commit edilmemeli veya
-  paylaşılmamalıdır.**
+- Değerlerin başında/sonunda boşluk bırakmayın.
+- `.env` Git tarafından yok sayılır; **asla commit edilmemeli, paylaşılmamalı veya
+  ekran görüntüsüne alınmamalıdır.**
+
+**Son kontrol listesi:**
+
+- [ ] ElevenLabs hesabında kota/faturalandırma durumu uygun.
+- [ ] Google Cloud projesinde faturalandırma (billing) bağlı.
+- [ ] **Cloud Translation API** etkin.
+- [ ] Google API anahtarı **Cloud Translation API** ile kısıtlı.
+- [ ] `.env` içinde üç satırın tümü dolu ve köşeli parantez yok.
 
 ### ElevenLabs Scribe v2
 
