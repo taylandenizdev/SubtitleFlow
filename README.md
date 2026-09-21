@@ -113,10 +113,8 @@ verilmez.
 
 ### ElevenLabs API anahtarı
 
-Kaynaklar: <https://help.elevenlabs.io/hc/en-us/articles/14599447207697> ve
-<https://elevenlabs.io/docs/api-reference/authentication>.
 
-1. <https://elevenlabs.io/> adresinden hesap oluşturun veya giriş yapın.
+1. <https://elevenlabs.io/app/developers/api-keys> adresinden hesap oluşturun veya giriş yapın.
 2. Sol menüden **Developers → API Keys**'e gidin.
 3. **Create API key** ile kısıtlı bir anahtar üretin; **Speech-to-Text/Scribe**
    erişimini etkinleştirin. İsteğe bağlı bir kredi limiti koyabilirsiniz.
@@ -125,8 +123,6 @@ Kaynaklar: <https://help.elevenlabs.io/hc/en-us/articles/14599447207697> ve
 
 ### Google Cloud Translation API anahtarı
 
-Kaynaklar: <https://cloud.google.com/translate/docs/setup> ve
-<https://cloud.google.com/docs/authentication/api-keys>.
 
 1. <https://console.cloud.google.com/> üzerinde bir proje oluşturun veya seçin.
 2. Projede **faturalandırmayı etkinleştirin** (billing hesabı bağlayın).
